@@ -17,6 +17,8 @@
 		142B72A1233353EC0022148E /* HomeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142B72A0233353EC0022148E /* HomeTableViewCell.swift */; };
 		142B72A423335D1C0022148E /* ModelUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142B72A323335D1C0022148E /* ModelUser.swift */; };
 		142B72A623335D280022148E /* ModelMakanan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 142B72A523335D280022148E /* ModelMakanan.swift */; };
+		146A10B12333B95B00CA8E84 /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146A10B02333B95B00CA8E84 /* CircularProgressView.swift */; };
+		146A10B52333E2E400CA8E84 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 146A10B42333E2E400CA8E84 /* HealthKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,9 @@
 		142B72A0233353EC0022148E /* HomeTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTableViewCell.swift; sourceTree = "<group>"; };
 		142B72A323335D1C0022148E /* ModelUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelUser.swift; sourceTree = "<group>"; };
 		142B72A523335D280022148E /* ModelMakanan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelMakanan.swift; sourceTree = "<group>"; };
+		146A10B02333B95B00CA8E84 /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
+		146A10B22333E2E400CA8E84 /* Nano Challenge 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Nano Challenge 2.entitlements"; sourceTree = "<group>"; };
+		146A10B42333E2E400CA8E84 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				146A10B52333E2E400CA8E84 /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,6 +56,7 @@
 			children = (
 				142B7286233247EE0022148E /* Nano Challenge 2 */,
 				142B7285233247EE0022148E /* Products */,
+				146A10B32333E2E400CA8E84 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -64,6 +71,7 @@
 		142B7286233247EE0022148E /* Nano Challenge 2 */ = {
 			isa = PBXGroup;
 			children = (
+				146A10B22333E2E400CA8E84 /* Nano Challenge 2.entitlements */,
 				142B72A223335D0B0022148E /* Model */,
 				142B729D233353C40022148E /* Table */,
 				142B7287233247EE0022148E /* AppDelegate.swift */,
@@ -71,6 +79,7 @@
 				142B728E233247EF0022148E /* Assets.xcassets */,
 				142B7290233247EF0022148E /* LaunchScreen.storyboard */,
 				142B7293233247EF0022148E /* Info.plist */,
+				146A10B02333B95B00CA8E84 /* CircularProgressView.swift */,
 			);
 			path = "Nano Challenge 2";
 			sourceTree = "<group>";
@@ -111,6 +120,14 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		146A10B32333E2E400CA8E84 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				146A10B42333E2E400CA8E84 /* HealthKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -143,6 +160,11 @@
 				TargetAttributes = {
 					142B7283233247EE0022148E = {
 						CreatedOnToolsVersion = 10.2.1;
+						SystemCapabilities = {
+							com.apple.HealthKit = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -184,6 +206,7 @@
 			files = (
 				142B72A423335D1C0022148E /* ModelUser.swift in Sources */,
 				142B728A233247EE0022148E /* ViewController.swift in Sources */,
+				146A10B12333B95B00CA8E84 /* CircularProgressView.swift in Sources */,
 				142B72A1233353EC0022148E /* HomeTableViewCell.swift in Sources */,
 				142B7288233247EE0022148E /* AppDelegate.swift in Sources */,
 				142B729A233255300022148E /* ListMakananViewController.swift in Sources */,
@@ -334,6 +357,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Nano Challenge 2/Nano Challenge 2.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = JC39HLBD2Z;
 				INFOPLIST_FILE = "Nano Challenge 2/Info.plist";
@@ -352,6 +376,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Nano Challenge 2/Nano Challenge 2.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = JC39HLBD2Z;
 				INFOPLIST_FILE = "Nano Challenge 2/Info.plist";

@@ -7,29 +7,46 @@
 //
 
 import UIKit
+import LocalAuthentication
 
 class ListMakananViewController: UIViewController {
-
-    @IBOutlet weak var tabelListMakanan: UITableView!
     
+    @IBOutlet weak var tabelListMakanan: UITableView!
+    var context = LAContext()
+    var state = AuthentificationState.LoggedOut
     
     override func viewDidLoad() {
         super.viewDidLoad()
         cellDelegate()
         tabelListMakanan.reloadData()
         
-//         self.navigationItem.title = "Food List"
-
+        context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
+        state = .LoggedOut
+        self.navigationItem.title = "Food List"
+        self.navigationController?.navigationBar.isHidden  = false
+        
         // Do any additional setup after loading the view.
     }
-        
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        AuthentificationState.LoggedOut
+    }
+    
+    //    @IBAction func startButton(_ sender: UIButton) {
+    //
+    //    }
+    enum AuthentificationState {
+        case loggedIn, LoggedOut
+    }
+}
+
 //    override func viewWillAppear(_ animated: Bool) {
 //        self.navigationController?.navigationBar.isHidden  = false
 //    }
-    
-    
-}
-    
+
+
+
 //    override func prepareForSegue(segue: (UIStoryboardSegue), sender: AnyObject!)
 //    {
 //        if segue.identifier == "goToFoodPage" {
@@ -37,7 +54,7 @@ class ListMakananViewController: UIViewController {
 //            viewControllerB.dataPassed = labelOne.text
 //        }
 //    }
-    
+
 //    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 //        let detail = segue.destination as! ViewController
 //        detail.passedDataString = "234"
@@ -58,15 +75,15 @@ class ListMakananViewController: UIViewController {
 
 
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
+/*
+ // MARK: - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+ // Get the new view controller using segue.destination.
+ // Pass the selected object to the new view controller.
+ }
+ */
 
 
 extension ListMakananViewController:UITableViewDataSource, UITableViewDelegate{
@@ -77,7 +94,7 @@ extension ListMakananViewController:UITableViewDataSource, UITableViewDelegate{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "listMakanCell", for: indexPath) as! ListMakananTableViewCell
-      
+        
         let calori  = tableMakanan[indexPath.row].kaloriMakanan
         
         cell.namaMakanan.text = tableMakanan[indexPath.row].namaMakanan
@@ -94,7 +111,43 @@ extension ListMakananViewController:UITableViewDataSource, UITableViewDelegate{
         let a = User(userNamaMakanan: tableMakanan[indexPath.row].namaMakanan, userKaloriMakanan: tableMakanan[indexPath.row].kaloriMakanan)
         tableUser.append(a)
         
-        self.navigationController?.popViewController(animated: true)
+        if state == .loggedIn
+        {
+            state = .LoggedOut
+            
+        }
+        else
+        {
+            
+            context = LAContext()
+            
+            var error: NSError?
+            if context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
+            {
+                let reason = "Log in to your account"
+                context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason ) { success, error in
+                    if success {
+                        DispatchQueue.main.async { [unowned self] in
+                            self.state = .loggedIn
+                            
+                            self.state = .LoggedOut
+                            
+                            self.navigationController?.popViewController(animated: true)
+                        }
+                        
+                    }
+                    else
+                    {
+                        print(error?.localizedDescription ?? "Failed to authenticate")
+                    }}
+            }
+            else
+            {
+                print(error?.localizedDescription ?? "Can't evaluate policy")
+            }
+            
+        }
+        
     }
     
     
