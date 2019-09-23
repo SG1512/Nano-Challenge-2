@@ -8,13 +8,15 @@
 
 import UIKit
 import HealthKit
+import UserNotifications
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UNUserNotificationCenterDelegate {
     
     let healthStore = HKHealthStore()
     let sampleData = [String]()
     var targetDist : Double = 0.0
     var jumlahDist : Double = 0.0
+    let center = UNUserNotificationCenter.current()
     @IBOutlet weak var circularProgress: CircularProgressView!
     
     @IBOutlet weak var buttonAdd: UIButton!
@@ -25,9 +27,9 @@ class ViewController: UIViewController {
     @IBOutlet weak var homeTable: UITableView!
     @IBOutlet weak var totalKalori: UILabel!
     var grandTotal : Int = 0
-    var percentage : Float = 0.5
+//    var percentage : Float = 0.0
     
-    let shapeLayer = CAShapeLayer()
+//    let shapeLayer = CAShapeLayer()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,12 +37,15 @@ class ViewController: UIViewController {
         targetKalori()
         checkAvailability()
         getHealthData()
+        requestPermissionNotifications()
+//        setPercentage()
         
-        self.navigationController?.navigationBar.isHidden  = true
         
-        circularProgress.trackColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
-        circularProgress.progressColor = #colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)
-        circularProgress.setProgressWithAnimation(duration: 1.0, value: percentage)
+        
+        circularProgress.trackColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        circularProgress.progressColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
+//        circularProgress.setProgressWithAnimation(duration: 1.0, value: percentage)
+        
         buttonAdd.layer.shadowColor = #colorLiteral(red: 0.3333333433, green: 0.3333333433, blue: 0.3333333433, alpha: 1)
         buttonAdd.layer.shadowRadius = 2
         buttonAdd.layer.shadowOpacity = 0.7
@@ -48,6 +53,8 @@ class ViewController: UIViewController {
         
         
     }
+    
+
     
     
     
@@ -60,6 +67,7 @@ class ViewController: UIViewController {
         totalCalories()
         targetKalori()
         calculatePercentage()
+        self.navigationController?.navigationBar.isHidden  = true
         
     }
     
@@ -77,7 +85,7 @@ class ViewController: UIViewController {
             grandTotal += index.userKaloriMakanan
         }
         print(grandTotal)
-        totalKalori.text = "\(grandTotal)"
+        totalKalori.text = "\(grandTotal) kkal"
     }
     
     func checkAvailability(){
@@ -95,15 +103,22 @@ class ViewController: UIViewController {
         }
     }
     
+//    func setPercentage(){
+//        self.percentage = (Float(jumlahDist) / Float(targetDist))
+//    }
+    
+    
         func calculatePercentage(){
-           
+        let fraction = (jumlahDist / targetDist)
+            let frac = fraction * 100
+                self.labelPersen.text = String(format:"%.2f %%", frac)
+            circularProgress.setProgressWithAnimation(duration: 1.0, value: Float(fraction))
             
-        let fraction = (targetDist - jumlahDist) / targetDist
-            print(fraction)
-      
-            self.labelPersen.text = String(format: "%2f", fraction)
-//            String(format:"%.2f", self.jumlahDist)
+            if frac >= 100 {
+                postLocalNotifications(eventTitle:"Burn Skuy")
+            }
             
+
     }
            
     
@@ -182,8 +197,8 @@ class ViewController: UIViewController {
             targetDistance.text = "\(targetDist)"
             deskripsiJarak.text = "Dont forget to eat!";
             break
-        case 10...1200:
-            targetDist = 1.6
+        case 10...808:
+            targetDist = 1.30
             targetDistance.text = "\(targetDist)"
             deskripsiJarak.text = "You have to walk 1.6 km, Burn your calories!";
             break
@@ -200,6 +215,82 @@ class ViewController: UIViewController {
         default:
             print("nah")
         }
+    }
+    
+    func requestPermissionNotifications(){
+        let application =  UIApplication.shared
+        
+        if #available(iOS 10.0, *) {
+            // For iOS 10 display notification (sent via APNS)
+            UNUserNotificationCenter.current().delegate = self
+            
+            let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+            UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { (isAuthorized, error) in
+                if( error != nil ){
+                    print(error!)
+                }
+                else{
+                    if( isAuthorized ){
+                        print("authorized")
+                        NotificationCenter.default.post(Notification(name: Notification.Name("AUTHORIZED")))
+                    }
+                    else{
+                        let pushPreference = UserDefaults.standard.bool(forKey: "PREF_PUSH_NOTIFICATIONS")
+                        if pushPreference == false {
+                            let alert = UIAlertController(title: "Turn on Notifications", message: "Push notifications are turned off.", preferredStyle: .alert)
+                            alert.addAction(UIAlertAction(title: "Turn on notifications", style: .default, handler: { (alertAction) in
+                                guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+                                    return
+                                }
+                                
+                                if UIApplication.shared.canOpenURL(settingsUrl) {
+                                    UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
+                                        // Checking for setting is opened or not
+                                        print("Setting is opened: \(success)")
+                                    })
+                                }
+                                UserDefaults.standard.set(true, forKey: "PREF_PUSH_NOTIFICATIONS")
+                            }))
+                            alert.addAction(UIAlertAction(title: "No thanks.", style: .default, handler: { (actionAlert) in
+                                print("user denied")
+                                UserDefaults.standard.set(true, forKey: "PREF_PUSH_NOTIFICATIONS")
+                            }))
+                            let viewController = UIApplication.shared.keyWindow!.rootViewController
+                            DispatchQueue.main.async {
+                                viewController?.present(alert, animated: true, completion: nil)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            let settings: UIUserNotificationSettings =
+                UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+            application.registerUserNotificationSettings(settings)
+        }
+    }
+    
+    func postLocalNotifications(eventTitle:String){
+        let center = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        content.title = eventTitle
+        content.body = "Yeay! You Have Reach Your Walk Distance"
+        content.sound = UNNotificationSound.default
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        
+        let notificationRequest:UNNotificationRequest = UNNotificationRequest(identifier: "timerDone", content: content, trigger: trigger)
+        
+        center.add(notificationRequest, withCompletionHandler: { (error) in
+            if let error = error {
+                // Something went wrong
+                print(error)
+            }
+            else{
+                print("added")
+            }
+        })
     }
     
 }
